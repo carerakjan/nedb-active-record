@@ -1,0 +1,22 @@
+{
+  "name": "nedb-active-record",
+  "version": "0.1.1",
+  "description": "Simple realization of ActiveRecord pattern for NeDB",
+  "main": "index.js",
+  "author": {
+    "name": "Bohdan Hryhorian",
+    "email": "carerakjan@gmail.com"
+  },
+  "dependencies": {
+    "nedb": "1.5.1",
+    "shortid": "2.2.4",
+    "lodash": "4.0.0",
+    "q": "1.4.1"
+  },
+  "license": "ISC",
+  "readme": "ERROR: No README data found!",
+  "_id": "nedb-active-record@0.1.1",
+  "scripts": {},
+  "_shasum": "b5ea0a96eafca870103ca72a5f30c59f8ecf0fd0",
+  "_from": "nedb-active-record@"
+}
