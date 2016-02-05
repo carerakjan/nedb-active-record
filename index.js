@@ -35,7 +35,7 @@ function ActiveRecord(name) {
     };
     
     var ext = {
-        format:'json',
+        format:'txt',
         location:'database'
     };
 

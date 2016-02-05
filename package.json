@@ -1,6 +1,6 @@
 {
   "name": "nedb-active-record",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "Simple realization of ActiveRecord pattern for NeDB",
   "main": "index.js",
   "repository" : {
@@ -18,7 +18,6 @@
     "q": "1.4.1"
   },
   "license": "MIT",
-  "readme": "ERROR: No README data found!",
   "_id": "nedb-active-record@0.1.1",
   "scripts": {},
   "_shasum": "b5ea0a96eafca870103ca72a5f30c59f8ecf0fd0",
