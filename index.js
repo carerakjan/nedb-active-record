@@ -1,12 +1,8 @@
-/**
- * @title nedb-active-record
- * @type {*|exports|module.exports}
- */
+'use strict';
 
-Q = require('q');
-DB = require('nedb');
-ID = require('shortid');
-_ = require('lodash');
+var Q = require('q');
+var DB = require('nedb');
+var _ = require('lodash');
 
 /**
  * ActiveRecord for NeDB
@@ -18,21 +14,7 @@ _ = require('lodash');
  */
 function ActiveRecord(name) {
 
-    /**
-     * NeDB constructor options
-     * FYI: https://github.com/louischatriot/nedb#creatingloading-a-database
-     */
-    var cfg = {
-        filename:'',
-        inMemoryOnly: false,
-        timestampData: false,
-        autoload: false,
-        onload: null,
-        afterSerialization: null,
-        beforeDeserialization: null,
-        corruptAlertThreshold: 0.1,
-        compareStrings: null
-    };
+    var cfg = {};
     
     var ext = {
         format:'txt',
@@ -54,7 +36,11 @@ function ActiveRecord(name) {
     (ext.location = cfg.location) &&
     (delete cfg.location);
 
-    cfg.filename = buildFileName(name);
+    if(name) {
+        cfg.filename = buildFileName(name);
+    } else {
+        throw new Error("Required parameter 'name' is not defined!");
+    }
 
     var db = new DB(cfg);
 
@@ -72,12 +58,11 @@ function ActiveRecord(name) {
     }
 
     F.prototype.save = function() {
-        var self = this;
-        return F.update({_id: this._id}, this, {upsert: true})
+        return F.update({_id: this._id}, _.clone(this), {upsert: true})
             .then(function(data){
-                _.isArray(data) && _.extend(self, data[1]);
+                _.isArray(data) && _.extend(this, data[1]);
                 return data;
-            });
+            }.bind(this));
     };
 
     F.prototype.remove = function() {
@@ -111,7 +96,7 @@ function ActiveRecord(name) {
     }
 
     function generateId(o){
-        o && !o._id && (o._id = ID.generate());
+        o && !o._id && (o._id = db.createNewId());
     }
 
     /**

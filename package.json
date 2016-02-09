@@ -1,11 +1,11 @@
 {
   "name": "nedb-active-record",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Simple realization of ActiveRecord pattern for NeDB",
   "main": "index.js",
-  "repository" : {
-    "type" : "git",
-    "url" : "https://github.com/carerakjan/nedb-active-record.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carerakjan/nedb-active-record.git"
   },
   "author": {
     "name": "Bohdan Hryhorian",
@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "nedb": "1.5.1",
-    "shortid": "2.2.4",
     "lodash": "4.0.0",
     "q": "1.4.1"
   },
