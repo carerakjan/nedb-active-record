@@ -3,6 +3,7 @@
 var Q = require('q');
 var DB = require('nedb');
 var _ = require('lodash');
+var Flow = require('./lib/flow');
 
 /**
  * ActiveRecord for NeDB
@@ -46,6 +47,8 @@ function ActiveRecord(name) {
 
     !cfg.autoload && db.loadDatabase();
 
+    var flow = new Flow();
+
     /**
      * The exported class is responsible for a specific collection
      *
@@ -58,15 +61,26 @@ function ActiveRecord(name) {
     }
 
     F.prototype.save = function() {
-        return F.update({_id: this._id}, _.clone(this), {upsert: true})
-            .then(function(data){
-                _.isArray(data) && _.extend(this, data[1]);
-                return data;
-            }.bind(this));
+        var buffer = _.clone(this);
+
+        return flow.execute(function(){
+
+            this.createdAt &&
+            (buffer.createdAt = this.createdAt);
+
+            return F.update({_id: this._id}, buffer, { upsert: true })
+                .then(function(data){
+                    _.isArray(data) && _.extend(this, data[1]);
+                    return data;
+                }.bind(this));
+
+        }.bind(this));
     };
 
     F.prototype.remove = function() {
-        return F.remove({_id: this._id}, {});
+        return flow.execute(function(){
+            return F.remove({_id: this._id}, {});
+        }.bind(this));
     };
 
     /**
@@ -76,14 +90,14 @@ function ActiveRecord(name) {
      * @constructor
      */
     function C(dbCursor) {
-        var self = this, chain = dbCursor;
+        var chain = dbCursor;
 
         _.each(['sort', 'skip', 'limit', 'projection'], function(fName) {
-            self[fName] = function() {
+            this[fName] = function() {
                 chain = chain[fName].apply(chain, arguments);
-                return self;
+                return this;
             }
-        });
+        }.bind(this));
 
         this.exec = function(){
             return convertToPromise(chain, 'exec', [])
