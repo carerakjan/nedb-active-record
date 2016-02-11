@@ -19,6 +19,9 @@ flow.execute(function() {
 flow.execute(function(){
     car.color = 'red/white';
     return car.save();
+}).then(function(){
+    car.transmission = 'mechanics';
+    return car.save();
 });
 
 

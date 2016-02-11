@@ -26,3 +26,5 @@ user.save();
 
 user.address = {index:'04128', phone:'0637575757'};
 user.save();
+
+user.remove();

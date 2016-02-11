@@ -61,26 +61,23 @@ function ActiveRecord(name) {
     }
 
     F.prototype.save = function() {
-        var buffer = _.clone(this);
+        var buffer = _.clone(this),
+            refreshBuffer = function() {
+                this.createdAt &&
+                (buffer.createdAt = this.createdAt);
+            },
+            syncData = function(data){
+                return _.isArray(data) &&
+                    _.extend(this, data[1]) || data;
+            };
 
-        return flow.execute(function(){
-
-            this.createdAt &&
-            (buffer.createdAt = this.createdAt);
-
-            return F.update({_id: this._id}, buffer, { upsert: true })
-                .then(function(data){
-                    _.isArray(data) && _.extend(this, data[1]);
-                    return data;
-                }.bind(this));
-
-        }.bind(this));
+        return F.pre(refreshBuffer.bind(this))
+            .update({_id: this._id}, buffer, { upsert: true })
+            .then(syncData.bind(this));
     };
 
     F.prototype.remove = function() {
-        return flow.execute(function(){
-            return F.remove({_id: this._id}, {});
-        }.bind(this));
+        return F.remove({_id: this._id}, {});
     };
 
     /**
@@ -147,7 +144,9 @@ function ActiveRecord(name) {
     }
 
     function convertToPromise(ctx, method, args) {
-        return Q.nfapply(ctx[method].bind(ctx), args);
+        return flow.execute(function(){
+            return Q.nfapply(ctx[method].bind(ctx), args);
+        });
     }
 
     function createRecord(doc) {
@@ -176,6 +175,10 @@ function ActiveRecord(name) {
         }
     };
 
+    F.pre = function(fn) {
+        return flow.execute(fn) && F;
+    };
+
     F.update = function(){
         return convertToPromise(db, 'update', arguments)
             .then(dbCallbacks.update);
@@ -186,18 +189,23 @@ function ActiveRecord(name) {
             .then(dbCallbacks.insert);
     };
 
+    F.remove = function(){
+        return convertToPromise(db, 'remove', arguments);
+    };
+
+    F.ensureIndex = function(){
+        return convertToPromise(db, 'ensureIndex', arguments);
+    };
+
+    F.removeIndex = function(){
+        return convertToPromise(db, 'removeIndex', arguments);
+    };
+
     F.find = generateCursorApi('find');
 
     F.count = generateCursorApi('count');
 
     F.findOne = generateCursorApi('findOne');
-
-
-    F.remove = Q.nbind(db.remove, db);
-
-    F.ensureIndex = Q.nbind(db.ensureIndex, db);
-
-    F.removeIndex = Q.nbind(db.removeIndex, db);
 
     return F;
 }

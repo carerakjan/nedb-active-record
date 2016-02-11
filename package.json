@@ -1,6 +1,6 @@
 {
   "name": "nedb-active-record",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Simple realization of ActiveRecord pattern for NeDB",
   "main": "index.js",
   "repository": {
@@ -12,7 +12,7 @@
     "email": "carerakjan@gmail.com"
   },
   "dependencies": {
-    "nedb": "1.5.1",
+    "nedb": "1.7.4",
     "lodash": "4.0.0",
     "q": "1.4.1"
   },
