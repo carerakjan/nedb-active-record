@@ -97,12 +97,11 @@ function ActiveRecord(name) {
         }.bind(this));
 
         this.exec = function(){
-            return convertToPromise(chain, 'exec', [])
-                .then(function(data){
-                    if(_.isArray(data)) return dbCallbacks.find(data);
-                    if(_.isObject(data)) return dbCallbacks.findOne(data);
-                    return data;
-                });
+            return convertToPromise(chain, 'exec', [], function(data) {
+                if(_.isArray(data)) return dbCallbacks.find(data);
+                if(_.isObject(data)) return dbCallbacks.findOne(data);
+                return data;
+            });
         };
     }
 
@@ -133,19 +132,17 @@ function ActiveRecord(name) {
                 return cursor.exec();
             }
 
-            var promise = convertToPromise(db, fnName, arguments);
-
-            switch(fnName){
-                default: return promise;
-                case 'find': return promise.then(dbCallbacks.find);
-                case 'findOne': return promise.then(dbCallbacks.findOne);
-            }
+            return convertToPromise(db, fnName, arguments,
+                (fnName === 'find' ? dbCallbacks.find : (fnName === 'findOne' ? dbCallbacks.findOne : null)));
         };
     }
 
-    function convertToPromise(ctx, method, args) {
+    function convertToPromise(ctx, method, args, success) {
         return flow.execute(function(){
-            return Q.nfapply(ctx[method].bind(ctx), args);
+            var promise = Q.nfapply(ctx[method].bind(ctx), args);
+            return success
+                ? promise.then(success)
+                : promise;
         });
     }
 
@@ -180,13 +177,11 @@ function ActiveRecord(name) {
     };
 
     F.update = function(){
-        return convertToPromise(db, 'update', arguments)
-            .then(dbCallbacks.update);
+        return convertToPromise(db, 'update', arguments, dbCallbacks.update);
     };
 
     F.insert = function(){
-        return convertToPromise(db, 'insert', arguments)
-            .then(dbCallbacks.insert);
+        return convertToPromise(db, 'insert', arguments, dbCallbacks.insert);
     };
 
     F.remove = function(){
