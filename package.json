@@ -1,6 +1,6 @@
 {
   "name": "nedb-active-record",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Simple realization of ActiveRecord pattern for NeDB",
   "main": "index.js",
   "repository": {

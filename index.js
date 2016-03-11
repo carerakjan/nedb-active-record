@@ -147,7 +147,7 @@ function ActiveRecord(name) {
     }
 
     function createRecord(doc) {
-        return new F(doc);
+        return doc ? new F(doc) : null;
     }
 
     var dbCallbacks = {
